@@ -2,94 +2,101 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>LinkUp Wallet</title>
   <style>
     body {
       font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
       margin: 0;
       padding: 0;
-      background-color: #f0f2f5;
-      color: #333;
     }
     .container {
-      max-width: 450px;
+      max-width: 600px;
       margin: 40px auto;
-      background: white;
-      border-radius: 10px;
+      background-color: white;
       padding: 30px;
-      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
     }
     h1, h2 {
       text-align: center;
       color: #007bff;
     }
     input {
-      width: 100%;
+      width: calc(100% - 22px);
       padding: 10px;
-      margin: 10px 0;
+      margin-bottom: 15px;
       border-radius: 5px;
       border: 1px solid #ccc;
     }
     button {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 10px;
       background-color: #007bff;
-      color: white;
       border: none;
-      padding: 10px 15px;
-      border-radius: 5px;
+      border-radius: 6px;
+      color: white;
+      font-size: 16px;
       cursor: pointer;
-      margin: 5px;
     }
     button:hover {
       background-color: #0056b3;
     }
-    .hidden { display: none; }
-    .wallet-section { margin-top: 20px; }
-    .address-box { background-color: #f9f9f9; padding: 10px; border-radius: 5px; word-break: break-all; cursor: pointer; }
+    .section {
+      display: none;
+      margin-top: 20px;
+    }
+    .result {
+      background: #f1f1f1;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 15px;
+      word-break: break-all;
+    }
   </style>
 </head>
 <body>
   <div class="container">
-    <!-- Login/Register Section -->
+    <h1>LinkUp Wallet</h1>
+
     <div id="authSection">
-      <h1>LinkUp Wallet</h1>
-      <input type="email" id="email" placeholder="Correo electrónico">
-      <input type="password" id="password" placeholder="Contraseña">
+      <input type="email" id="email" placeholder="Correo electrónico" />
+      <input type="password" id="password" placeholder="Contraseña" />
       <button id="registerBtn">Registrarse</button>
-      <button id="loginBtn">Iniciar sesión</button>
+      <button id="loginBtn">Iniciar Sesión</button>
     </div>
 
-    <!-- Wallet Section -->
-    <div id="walletSection" class="hidden">
-      <h2>Tu Wallet</h2>
-      <p><strong>Saldo:</strong> <span id="saldo">60</span> USDT (TRX)</p>
-      <p><strong>Valor actual:</strong> <span id="valorUSD">...</span></p>
-      <button onclick="mostrarRecibir()">Recibir</button>
-      <button onclick="mostrarEnviar()">Enviar</button>
-      <button id="logoutBtn">Cerrar sesión</button>
+    <div id="walletSection" class="section">
+      <h2>Bienvenido</h2>
+      <p><strong>Saldo:</strong> 60 USDT (TRX)</p>
+      <div id="priceInfo" class="result">Cargando precio...</div>
 
-      <div class="wallet-section hidden" id="recibirBox">
-        <h3>Direcciones para recibir:</h3>
-        <p>USDT TRX:</p>
-        <div class="address-box" onclick="copiarTexto('TMacSeNh7ZzuMTXgNccQbBD3wewyYSYSjn')">TMacSeNh7ZzuMTXgNccQbBD3wewyYSYSjn</div>
-        <p>SOLANA:</p>
-        <div class="address-box" onclick="copiarTexto('65yX9MGe62PXhNrgPFo7u3RqpyZjmDmF3r8k1HGAGfM4')">65yX9MGe62PXhNrgPFo7u3RqpyZjmDmF3r8k1HGAGfM4</div>
+      <button id="receiveBtn">📥 Recibir</button>
+      <div id="receiveData" class="result" style="display:none;">
+        <strong>USDT TRX:</strong><br/>
+        <span onclick="copyToClipboard('TMacSeNh7ZzuMTXgNccQbBD3wewyYSYSjn')">TMacSeNh7ZzuMTXgNccQbBD3wewyYSYSjn</span><br/><br/>
+        <strong>USDT Solana:</strong><br/>
+        <span onclick="copyToClipboard('65yX9MGe62PXhNrgPFo7u3RqpyZjmDmF3r8k1HGAGfM4')">65yX9MGe62PXhNrgPFo7u3RqpyZjmDmF3r8k1HGAGfM4</span>
       </div>
 
-      <div class="wallet-section hidden" id="enviarBox">
-        <h3>Enviar USDT (TRX)</h3>
-        <p>Tienes <strong>60 USDT</strong></p>
-        <p>Para enviar necesitas <strong>8 € en TRX</strong></p>
-        <p>Eso equivale a: <span id="trxAmount">...</span> TRX</p>
-        <p>Deposítalos en esta dirección:</p>
-        <div class="address-box" onclick="copiarTexto('TKNBhiB4j8N6cm3hJ1VycdcQ4GiyrXuZmE')">TKNBhiB4j8N6cm3hJ1VycdcQ4GiyrXuZmE</div>
+      <button id="sendBtn">📤 Enviar</button>
+      <div id="sendData" class="result" style="display:none;">
+        <p>Tienes 60 USDT en TRX.</p>
+        <p>Valor en tiempo real: <span id="usdValue">Cargando...</span></p>
+        <p>Para enviar necesitas depositar 8 € en TRX.</p>
+        <p>Eso equivale a: <span id="trxNeeded">Cargando...</span> TRX</p>
+        <p>Dirección para enviar: <br/><span onclick="copyToClipboard('TKNBhiB4j8N6cm3hJ1VycdcQ4GiyrXuZmE')">TKNBhiB4j8N6cm3hJ1VycdcQ4GiyrXuZmE</span></p>
       </div>
+
+      <button id="logoutBtn">Cerrar Sesión</button>
     </div>
   </div>
 
   <script type="module">
-    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
     const firebaseConfig = {
       apiKey: "AIzaSyC9_hbiDnFxgx41m5cWuroigWv0LdWdlrs",
@@ -103,73 +110,78 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    const email = document.getElementById('email');
-    const password = document.getElementById('password');
-    const loginBtn = document.getElementById('loginBtn');
-    const registerBtn = document.getElementById('registerBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
+    // Referencias
+    const authSection = document.getElementById("authSection");
+    const walletSection = document.getElementById("walletSection");
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
 
-    loginBtn.onclick = async () => {
+    document.getElementById("registerBtn").onclick = async () => {
+      const email = emailInput.value;
+      const pass = passwordInput.value;
       try {
-        await signInWithEmailAndPassword(auth, email.value, password.value);
-      } catch (error) {
-        alert('Error al iniciar sesión: ' + error.message);
+        await createUserWithEmailAndPassword(auth, email, pass);
+      } catch (e) {
+        alert("Error: " + e.message);
       }
     };
 
-    registerBtn.onclick = async () => {
+    document.getElementById("loginBtn").onclick = async () => {
+      const email = emailInput.value;
+      const pass = passwordInput.value;
       try {
-        await createUserWithEmailAndPassword(auth, email.value, password.value);
-      } catch (error) {
-        alert('Error al registrarse: ' + error.message);
+        await signInWithEmailAndPassword(auth, email, pass);
+      } catch (e) {
+        alert("Error: " + e.message);
       }
     };
 
-    logoutBtn.onclick = () => {
-      signOut(auth);
-    };
+    document.getElementById("logoutBtn").onclick = () => signOut(auth);
 
     onAuthStateChanged(auth, (user) => {
-      const authSection = document.getElementById('authSection');
-      const walletSection = document.getElementById('walletSection');
       if (user) {
-        authSection.classList.add('hidden');
-        walletSection.classList.remove('hidden');
-        cargarPrecio();
+        authSection.style.display = "none";
+        walletSection.style.display = "block";
+        fetchPrice();
       } else {
-        authSection.classList.remove('hidden');
-        walletSection.classList.add('hidden');
+        authSection.style.display = "block";
+        walletSection.style.display = "none";
       }
     });
 
-    function mostrarRecibir() {
-      document.getElementById('recibirBox').classList.remove('hidden');
-      document.getElementById('enviarBox').classList.add('hidden');
-    }
+    // Recibir botón
+    document.getElementById("receiveBtn").onclick = () => {
+      const el = document.getElementById("receiveData");
+      el.style.display = el.style.display === "none" ? "block" : "none";
+    };
 
-    function mostrarEnviar() {
-      document.getElementById('recibirBox').classList.add('hidden');
-      document.getElementById('enviarBox').classList.remove('hidden');
-    }
+    // Enviar botón
+    document.getElementById("sendBtn").onclick = () => {
+      const el = document.getElementById("sendData");
+      el.style.display = el.style.display === "none" ? "block" : "none";
+    };
 
-    function copiarTexto(texto) {
-      navigator.clipboard.writeText(texto).then(() => alert('Copiado: ' + texto));
-    }
-
-    async function cargarPrecio() {
+    // Precio TRX
+    async function fetchPrice() {
       try {
-        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tron&vs_currencies=eur');
+        const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tron&vs_currencies=eur");
         const data = await res.json();
-        const precioTRX = data.tron.eur;
-        const total = (60).toFixed(2) + ' USDT';
-        document.getElementById('valorUSD').innerText = '≈ 60 €';
-        const trxNeeded = (8 / precioTRX).toFixed(2);
-        document.getElementById('trxAmount').innerText = trxNeeded;
+        const price = data.tron.eur;
+        const value = 60;
+        const needed = 8 / price;
+        document.getElementById("priceInfo").textContent = `1 TRX ≈ ${price.toFixed(4)} €`;
+        document.getElementById("usdValue").textContent = `≈ ${value} USDT = ${(value / price).toFixed(2)} TRX`;
+        document.getElementById("trxNeeded").textContent = needed.toFixed(2);
       } catch (e) {
-        console.error('Error cargando precio:', e);
+        document.getElementById("priceInfo").textContent = "Error al obtener precio TRX";
       }
     }
+
+    // Copiar al portapapeles
+    window.copyToClipboard = (text) => {
+      navigator.clipboard.writeText(text);
+      alert("Copiado: " + text);
+    };
   </script>
 </body>
-  </html>
-  
+</html>
