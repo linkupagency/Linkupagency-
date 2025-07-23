@@ -1,190 +1,195 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>LinkUp - Autenticación Firebase</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background-color: #f4f4f4; color: #333; }
-        .container { background-color: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); max-width: 500px; margin: 0 auto; }
-        h1, h2 { text-align: center; color: #007bff; }
-        input[type="email"], input[type="password"] { width: calc(100% - 20px); padding: 10px; margin-bottom: 15px; border: 1px solid #ddd; border-radius: 4px; }
-        button { background-color: #007bff; color: white; padding: 10px 15px; border: none; border-radius: 4px; cursor: pointer; font-size: 16px; margin-right: 10px; }
-        button:hover { background-color: #0056b3; }
-        button:disabled { background-color: #cccccc; cursor: not-allowed; }
-        .message { margin-top: 20px; padding: 10px; border-radius: 4px; }
-        .success { background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        .error { background-color: #f8d7da; color: #721c24; border: 1px solid #f5c6cb; }
-        .user-status { margin-top: 20px; padding: 15px; background-color: #e9ecef; border-radius: 5px; text-align: center; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LinkUp - Wallet Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f4f4f4;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      background-color: #fff;
+      border-radius: 8px;
+      padding: 25px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    h1, h2 {
+      text-align: center;
+      color: #007bff;
+    }
+    input[type="email"], input[type="password"] {
+      width: calc(100% - 22px);
+      padding: 10px;
+      margin-bottom: 15px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      background-color: #007bff;
+      color: #fff;
+      padding: 10px 15px;
+      margin-right: 10px;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 16px;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .message {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 4px;
+    }
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .user-status {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #e9ecef;
+      border-radius: 5px;
+      text-align: center;
+    }
+    #wallet {
+      display: none;
+      text-align: center;
+      background-color: #e0ffe0;
+      padding: 20px;
+      margin-top: 20px;
+      border-radius: 10px;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <h1>¡Bienvenido a LinkUp!</h1>
-        <p>Aquí puedes registrarte, iniciar sesión o cerrar tu sesión.</p>
+  <div class="container">
+    <h1>LinkUp Wallet 🔐</h1>
+    <p>Regístrate o inicia sesión para acceder a tu saldo ficticio.</p>
 
-        <h2>Registrarse / Iniciar Sesión</h2>
-        <input type="email" id="email" placeholder="Correo electrónico">
-        <input type="password" id="password" placeholder="Contraseña (mínimo 6 caracteres)">
-        <button id="registerBtn">Registrarse</button>
-        <button id="loginBtn">Iniciar Sesión</button>
-        <button id="logoutBtn" style="display: none;">Cerrar Sesión</button>
+    <input type="email" id="email" placeholder="Correo electrónico" />
+    <input type="password" id="password" placeholder="Contraseña (mínimo 6 caracteres)" />
+    <br />
+    <button id="registerBtn">Registrarse</button>
+    <button id="loginBtn">Iniciar sesión</button>
+    <button id="logoutBtn" style="display:none;">Cerrar sesión</button>
 
-        <div id="message" class="message"></div>
+    <div id="message" class="message"></div>
 
-        <div id="userStatus" class="user-status">
-            <p>Estado del usuario: <span id="authStatus">Desconectado</span></p>
-            <p id="loggedInUserEmail"></p>
-        </div>
+    <div class="user-status">
+      Estado: <span id="authStatus">Desconectado</span>
+      <p id="loggedInUserEmail"></p>
     </div>
 
-    <!-- Script de Firebase SDK (desde CDN) -->
-    <script type="module">
-        // Importa las funciones necesarias del SDK modular de Firebase
-        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
-        import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-        import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js'; // Necesario para la línea de analytics
+    <!-- Wallet -->
+    <div id="wallet">
+      <h2>Tu Wallet 💼</h2>
+      <p>Saldo disponible: <strong>60 USDT 💸</strong></p>
+      <p>Gracias por usar <strong>LinkUpAgency</strong> 🔗</p>
+    </div>
+  </div>
 
-        // Tu configuración de Firebase (¡YA INCLUIDA AQUÍ!)
-        const firebaseConfig = {
-          apiKey: "AIzaSyC9_hbiDnFxgx41m5cWuroigWv0LdWdlrs",
-          authDomain: "linkup-11438.firebaseapp.com",
-          projectId: "linkup-11438",
-          storageBucket: "linkup-11438.firebasestorage.app",
-          messagingSenderId: "183432635859",
-          appId: "1:183432635859:web:1c1e25bf1ea24c03313b26",
-          measurementId: "G-6D2GG8CHDW"
-        };
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
 
-        // Inicializa Firebase y los servicios
-        const app = initializeApp(firebaseConfig);
-        const analytics = getAnalytics(app); // Inicializa Analytics
-        const auth = getAuth(app);           // Inicializa Autenticación
+    const firebaseConfig = {
+      apiKey: "AIzaSyC9_hbiDnFxgx41m5cWuroigWv0LdWdlrs",
+      authDomain: "linkup-11438.firebaseapp.com",
+      projectId: "linkup-11438",
+      storageBucket: "linkup-11438.appspot.com",
+      messagingSenderId: "183432635859",
+      appId: "1:183432635859:web:1c1e25bf1ea24c03313b26",
+      measurementId: "G-6D2GG8CHDW"
+    };
 
-        // Referencias a elementos del DOM
-        const emailInput = document.getElementById('email');
-        const passwordInput = document.getElementById('password');
-        const registerBtn = document.getElementById('registerBtn');
-        const loginBtn = document.getElementById('loginBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const messageDiv = document.getElementById('message');
-        const authStatusSpan = document.getElementById('authStatus');
-        const loggedInUserEmailSpan = document.getElementById('loggedInUserEmail');
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
 
-        // Función para mostrar mensajes al usuario
-        function showMessage(msg, type = 'success') {
-            messageDiv.textContent = msg;
-            messageDiv.className = `message ${type}`;
-        }
+    const emailInput = document.getElementById("email");
+    const passwordInput = document.getElementById("password");
+    const registerBtn = document.getElementById("registerBtn");
+    const loginBtn = document.getElementById("loginBtn");
+    const logoutBtn = document.getElementById("logoutBtn");
+    const messageDiv = document.getElementById("message");
+    const authStatusSpan = document.getElementById("authStatus");
+    const loggedInUserEmailSpan = document.getElementById("loggedInUserEmail");
+    const walletDiv = document.getElementById("wallet");
 
-        // --- Funciones de Autenticación ---
+    function showMessage(msg, type = "success") {
+      messageDiv.textContent = msg;
+      messageDiv.className = `message ${type}`;
+    }
 
-        // Función para registrar un nuevo usuario
-        registerBtn.addEventListener('click', async () => {
-            const email = emailInput.value;
-            const password = passwordInput.value;
+    registerBtn.addEventListener("click", async () => {
+      const email = emailInput.value;
+      const password = passwordInput.value;
+      if (!email || !password) return showMessage("Completa ambos campos.", "error");
 
-            if (!email || !password) {
-                showMessage('Por favor, ingresa un correo electrónico y una contraseña.', 'error');
-                return;
-            }
+      try {
+        const userCred = await createUserWithEmailAndPassword(auth, email, password);
+        showMessage(`¡Registro exitoso! Bienvenido: ${userCred.user.email}`, "success");
+      } catch (error) {
+        showMessage("Error: " + error.message, "error");
+      }
+    });
 
-            try {
-                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-                showMessage(`¡Registro exitoso! Usuario: ${userCredential.user.email}`, 'success');
-                emailInput.value = '';
-                passwordInput.value = '';
-            } catch (error) {
-                let errorMessage = 'Error al registrar el usuario.';
-                switch (error.code) {
-                    case 'auth/email-already-in-use':
-                        errorMessage = 'Este correo electrónico ya está registrado. Por favor, inicia sesión o usa otro correo.';
-                        break;
-                    case 'auth/invalid-email':
-                        errorMessage = 'El formato del correo electrónico no es válido.';
-                        break;
-                    case 'auth/weak-password':
-                        errorMessage = 'La contraseña es demasiado débil (mínimo 6 caracteres).';
-                        break;
-                    default:
-                        errorMessage = `Error: ${error.message}`;
-                        break;
-                }
-                showMessage(errorMessage, 'error');
-                console.error("Error de registro:", error.code, error.message);
-            }
-        });
+    loginBtn.addEventListener("click", async () => {
+      const email = emailInput.value;
+      const password = passwordInput.value;
+      if (!email || !password) return showMessage("Completa ambos campos.", "error");
 
-        // Función para iniciar sesión
-        loginBtn.addEventListener('click', async () => {
-            const email = emailInput.value;
-            const password = passwordInput.value;
+      try {
+        const userCred = await signInWithEmailAndPassword(auth, email, password);
+        showMessage(`¡Sesión iniciada como ${userCred.user.email}!`, "success");
+      } catch (error) {
+        showMessage("Error: " + error.message, "error");
+      }
+    });
 
-            if (!email || !password) {
-                showMessage('Por favor, ingresa un correo electrónico y una contraseña.', 'error');
-                return;
-            }
+    logoutBtn.addEventListener("click", async () => {
+      try {
+        await signOut(auth);
+        showMessage("Sesión cerrada correctamente", "success");
+      } catch (error) {
+        showMessage("Error: " + error.message, "error");
+      }
+    });
 
-            try {
-                const userCredential = await signInWithEmailAndPassword(auth, email, password);
-                showMessage(`¡Inicio de sesión exitoso! Usuario: ${userCredential.user.email}`, 'success');
-                emailInput.value = '';
-                passwordInput.value = '';
-            } catch (error) {
-                let errorMessage = 'Error al iniciar sesión.';
-                switch (error.code) {
-                    case 'auth/invalid-credential':
-                        errorMessage = 'Credenciales inválidas. Correo o contraseña incorrectos.';
-                        break;
-                    case 'auth/invalid-email':
-                        errorMessage = 'El formato del correo electrónico no es válido.';
-                        break;
-                    default:
-                        errorMessage = `Error: ${error.message}`;
-                        break;
-                }
-                showMessage(errorMessage, 'error');
-                console.error("Error de inicio de sesión:", error.code, error.message);
-            }
-        });
-
-        // Función para cerrar sesión
-        logoutBtn.addEventListener('click', async () => {
-            try {
-                await signOut(auth);
-                showMessage('Has cerrado sesión correctamente.', 'success');
-            } catch (error) {
-                showMessage(`Error al cerrar sesión: ${error.message}`, 'error');
-                console.error("Error al cerrar sesión:", error);
-            }
-        });
-
-        // --- Observador de Estado de Autenticación ---
-        // Esto es clave para saber si un usuario está logueado o no, y actualizar la UI
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                // El usuario ha iniciado sesión
-                authStatusSpan.textContent = 'Conectado';
-                loggedInUserEmailSpan.textContent = `(${user.email})`;
-                registerBtn.style.display = 'none';
-                loginBtn.style.display = 'none';
-                logoutBtn.style.display = 'inline-block';
-                emailInput.value = '';
-                passwordInput.value = '';
-                emailInput.disabled = true;
-                passwordInput.disabled = true;
-            } else {
-                // El usuario ha cerrado sesión o no ha iniciado sesión
-                authStatusSpan.textContent = 'Desconectado';
-                loggedInUserEmailSpan.textContent = '';
-                registerBtn.style.display = 'inline-block';
-                loginBtn.style.display = 'inline-block';
-                logoutBtn.style.display = 'none';
-                emailInput.disabled = false;
-                passwordInput.disabled = false;
-            }
-        });
-
-    </script>
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        authStatusSpan.textContent = "Conectado";
+        loggedInUserEmailSpan.textContent = user.email;
+        registerBtn.style.display = "none";
+        loginBtn.style.display = "none";
+        logoutBtn.style.display = "inline-block";
+        emailInput.disabled = true;
+        passwordInput.disabled = true;
+        walletDiv.style.display = "block";
+      } else {
+        authStatusSpan.textContent = "Desconectado";
+        loggedInUserEmailSpan.textContent = "";
+        registerBtn.style.display = "inline-block";
+        loginBtn.style.display = "inline-block";
+        logoutBtn.style.display = "none";
+        emailInput.disabled = false;
+        passwordInput.disabled = false;
+        walletDiv.style.display = "none";
+      }
+    });
+  </script>
 </body>
 </html>
