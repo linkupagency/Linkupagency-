@@ -9,7 +9,8 @@
     background-color: #0a0a0a;
     color: #fff;
     font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
-    margin: 0; padding: 0;
+    margin: 0;
+    padding: 0;
     display: flex;
     min-height: 100vh;
     flex-direction: column;
@@ -82,6 +83,7 @@
     margin-top: 5px;
     font-size: 1.2rem;
     font-weight: 600;
+    color: #43a047;
   }
   #buttonsRow {
     margin-top: 30px;
@@ -156,7 +158,6 @@
 </head>
 <body>
 <div class="container">
-  <!-- Página login -->
   <div id="loginPage">
     <h1>Iniciar Sesión / Registrarse</h1>
     <input type="email" id="email" placeholder="Correo electrónico" />
@@ -166,31 +167,29 @@
     <div id="loginMessage" class="message"></div>
   </div>
 
-  <!-- Página wallet -->
-  <div id="walletPage">
+  <div id="walletPage" style="display:none">
     <h1>Tu Wallet LinkUp</h1>
     <div id="balanceContainer">
       <div id="balance">60 USDT</div>
       <div id="change24h">+0.00 € (0.00%)</div>
     </div>
-
     <div id="buttonsRow">
       <button id="receiveBtn">Recibir</button>
       <button id="sendBtn">Enviar</button>
     </div>
-
-    <!-- Sección recibir -->
-    <div id="receiveSection" style="display:none;">
+    <div id="receiveSection" style="display:none">
       <h2>Recibir</h2>
-      <div><button class="crypto-receive-btn" data-addr="TMacSeNh7ZzuMTXgNccQbBD3wewyYSYSjn">USDT TRX</button></div>
-      <div><button class="crypto-receive-btn" data-addr="65yX9MGe62PXhNrgPFo7u3RqpyZjmDmF3r8k1HGAGfM4">Solana</button></div>
-      <div><button class="crypto-receive-btn" data-addr="TKNBhiB4j8N6cm3hJ1VycdcQ4GiyrXuZmE">TRX</button></div>
-      <div><button class="crypto-receive-btn" data-addr="bc1qexekzra9j9r76puusvkzfllq222mwgl806nr6g">Bitcoin (BTC)</button></div>
-      <div><button class="crypto-receive-btn" data-addr="0x2c945FA09139F942bd9164786CC272458260192b">Ethereum (ETH)</button></div>
+      <button class="crypto-receive-btn" data-addr="TMacSeNh7ZzuMTXgNccQbBD3wewyYSYSjn">USDT TRX</button>
+      <button class="crypto-receive-btn" data-addr="65yX9MGe62PXhNrgPFo7u3RqpyZjmDmF3r8k1HGAGfM4">Solana</button>
+      <button class="crypto-receive-btn" data-addr="TKNBhiB4j8N6cm3hJ1VycdcQ4GiyrXuZmE">TRX</button>
+      <button class="crypto-receive-btn" data-addr="bc1qexekzra9j9r76puusvkzfllq222mwgl806nr6g">BTC</button>
+      <button class="crypto-receive-btn" data-addr="0x2c945FA09139F942bd9164786CC272458260192b">ETH</button>
       <div id="receiveAddress" class="copy-address" style="display:none;"></div>
     </div>
-
-    <!-- Resto sin cambios... -->
+    <!-- sendSection y más código ya está bien configurado en tu versión -->
+  </div>
 </div>
+
+<!-- Tu script Firebase sigue igual debajo -->
 </body>
 </html>
