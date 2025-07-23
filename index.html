@@ -1,252 +1,452 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LinkUp Wallet</title>
-  <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background-color: #0e0e0e;
-      color: white;
-    }
-
-    .container {
-      max-width: 400px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-
-    .auth-section, .wallet-section {
-      display: none;
-    }
-
-    .auth-section.active, .wallet-section.active {
-      display: block;
-    }
-
-    input {
-      width: 100%;
-      padding: 10px;
-      margin-bottom: 10px;
-      background: #1e1e1e;
-      color: white;
-      border: 1px solid #444;
-      border-radius: 8px;
-    }
-
-    button {
-      background-color: #1f1f1f;
-      color: white;
-      padding: 10px;
-      margin: 5px 0;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      width: 100%;
-    }
-
-    button:hover {
-      background-color: #333;
-    }
-
-    .balance {
-      text-align: center;
-      font-size: 28px;
-      margin: 20px 0 5px;
-    }
-
-    .change24h {
-      text-align: center;
-      font-size: 14px;
-      margin-bottom: 20px;
-    }
-
-    .change-positive {
-      color: #00ff99;
-    }
-
-    .change-negative {
-      color: #ff4444;
-    }
-
-    .actions {
-      display: flex;
-      justify-content: space-between;
-      gap: 10px;
-      margin-bottom: 20px;
-    }
-
-    .crypto-list {
-      margin-top: 10px;
-    }
-
-    .crypto-item {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      border-bottom: 1px solid #222;
-      padding: 10px 0;
-    }
-
-    .crypto-item img {
-      width: 24px;
-      height: 24px;
-      margin-right: 10px;
-    }
-
-    .copy-box {
-      background-color: #1f1f1f;
-      padding: 10px;
-      border-radius: 8px;
-      text-align: center;
-      margin-top: 10px;
-    }
-
-    .copy-box span {
-      display: block;
-      margin-bottom: 5px;
-    }
-
-    .logout {
-      margin-top: 20px;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>LinkUp Wallet</title>
+<style>
+  /* Colores tipo Phantom Wallet */
+  body {
+    background-color: #0a0a0a; /* fondo negro oscuro */
+    color: #fff;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    margin: 0; padding: 0;
+    display: flex;
+    min-height: 100vh;
+    flex-direction: column;
+    align-items: center;
+  }
+  .container {
+    width: 100%;
+    max-width: 480px;
+    padding: 20px;
+    box-sizing: border-box;
+  }
+  h1 {
+    text-align: center;
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+  /* Login */
+  #loginPage {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  input[type="email"], input[type="password"] {
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: none;
+    background-color: #222;
+    color: white;
+    font-size: 16px;
+  }
+  input::placeholder {
+    color: #888;
+  }
+  button {
+    padding: 12px;
+    border-radius: 8px;
+    border: none;
+    background-color: #1a1a1a;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #333;
+  }
+  .message {
+    text-align: center;
+    margin-top: 10px;
+    font-weight: 600;
+  }
+  .error {
+    color: #e53935; /* rojo */
+  }
+  .success {
+    color: #43a047; /* verde */
+  }
+  /* Wallet */
+  #walletPage {
+    display: none;
+    flex-direction: column;
+  }
+  #balanceContainer {
+    text-align: center;
+    margin-top: 30px;
+  }
+  #balance {
+    font-size: 3rem;
+    font-weight: 700;
+  }
+  #change24h {
+    margin-top: 5px;
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #43a047; /* verde */
+  }
+  #buttonsRow {
+    margin-top: 30px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+  }
+  #buttonsRow button {
+    flex: 1;
+    max-width: 140px;
+  }
+  #receiveSection, #sendSection {
+    margin-top: 20px;
+    background-color: #121212;
+    border-radius: 12px;
+    padding: 20px;
+  }
+  .crypto-list {
+    margin-top: 25px;
+  }
+  .crypto-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 15px;
+    padding: 10px 15px;
+    background-color: #1a1a1a;
+    border-radius: 10px;
+  }
+  .crypto-item img {
+    width: 32px;
+    height: 32px;
+  }
+  .crypto-info {
+    flex-grow: 1;
+  }
+  .crypto-name {
+    font-weight: 600;
+    font-size: 1.1rem;
+  }
+  .crypto-balance {
+    font-weight: 600;
+  }
+  .crypto-price {
+    font-weight: 600;
+    text-align: right;
+    min-width: 110px;
+  }
+  .copy-address {
+    margin-top: 12px;
+    padding: 8px 12px;
+    background-color: #333;
+    border-radius: 8px;
+    cursor: pointer;
+    user-select: none;
+    font-size: 0.9rem;
+    text-align: center;
+  }
+  .copy-address:hover {
+    background-color: #555;
+  }
+  #logoutBtn {
+    margin-top: 40px;
+    background-color: #b71c1c;
+    width: 100%;
+    font-weight: 700;
+  }
+  #logoutBtn:hover {
+    background-color: #e53935;
+  }
+</style>
 </head>
 <body>
-  <div class="container">
-    <!-- Login/Registro -->
-    <div id="authSection" class="auth-section active">
-      <h2>Iniciar sesión o registrarse</h2>
-      <input type="email" id="email" placeholder="Correo electrónico" />
-      <input type="password" id="password" placeholder="Contraseña" />
-      <button id="loginBtn">Iniciar sesión</button>
-      <button id="registerBtn">Registrarse</button>
-    </div>
-
-    <!-- Wallet -->
-    <div id="walletSection" class="wallet-section">
-      <div class="balance" id="balance">60 USDT</div>
-      <div class="change24h" id="change24h">Cargando...</div>
-
-      <div class="actions">
-        <button onclick="showReceive()">Recibir</button>
-        <button onclick="showSend()">Enviar</button>
-      </div>
-
-      <div id="actionContainer"></div>
-
-      <div class="crypto-list" id="cryptoList"></div>
-
-      <button class="logout" id="logoutBtn">Cerrar sesión</button>
-    </div>
+<div class="container">
+  <!-- Página login -->
+  <div id="loginPage">
+    <h1>Iniciar Sesión / Registrarse</h1>
+    <input type="email" id="email" placeholder="Correo electrónico" />
+    <input type="password" id="password" placeholder="Contraseña (mínimo 6 caracteres)" />
+    <button id="registerBtn">Registrarse</button>
+    <button id="loginBtn">Iniciar Sesión</button>
+    <div id="loginMessage" class="message"></div>
   </div>
 
-  <!-- Firebase -->
-  <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+  <!-- Página wallet -->
+  <div id="walletPage">
+    <h1>Tu Wallet LinkUp</h1>
+    <div id="balanceContainer">
+      <div id="balance">60 USDT</div>
+      <div id="change24h">+0.00 € (0.00%)</div>
+    </div>
 
-    const firebaseConfig = {
-      apiKey: "AIzaSyC9_hbiDnFxgx41m5cWuroigWv0LdWdlrs",
-      authDomain: "linkup-11438.firebaseapp.com",
-      projectId: "linkup-11438",
-      storageBucket: "linkup-11438.appspot.com",
-      messagingSenderId: "183432635859",
-      appId: "1:183432635859:web:6cd6d6eabf273667313b26"
-    };
+    <div id="buttonsRow">
+      <button id="receiveBtn">Recibir</button>
+      <button id="sendBtn">Enviar</button>
+    </div>
 
-    const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
+    <!-- Sección recibir -->
+    <div id="receiveSection" style="display:none;">
+      <h2>Recibir</h2>
+      <div>
+        <button class="crypto-receive-btn" data-addr="TMacSeNh7ZzuMTXgNccQbBD3wewyYSYSjn">USDT TRX</button>
+      </div>
+      <div>
+        <button class="crypto-receive-btn" data-addr="65yX9MGe62PXhNrgPFo7u3RqpyZjmDmF3r8k1HGAGfM4">Solana</button>
+      </div>
+      <div id="receiveAddress" class="copy-address" style="display:none;"></div>
+    </div>
 
-    const email = document.getElementById("email");
-    const password = document.getElementById("password");
-    const loginBtn = document.getElementById("loginBtn");
-    const registerBtn = document.getElementById("registerBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
+    <!-- Sección enviar -->
+    <div id="sendSection" style="display:none;">
+      <h2>Enviar</h2>
+      <div>Saldo disponible:</div>
+      <div>60 USDT</div>
+      <div id="sendTokens">
+        
+        
+     </div>
+      <div style="margin-top: 15px;">
+        <p>Para enviar, primero debes depositar 8 € en TRX.</p>
+        <div class="copy-address" id="sendAddress" data-addr="TKNBhiB4j8N6cm3hJ1VycdcQ4GiyrXuZmE">Dirección TRX para depositar</div>
+      </div>
+    </div>
 
-    const authSection = document.getElementById("authSection");
-    const walletSection = document.getElementById("walletSection");
+    <!-- Lista de criptos -->
+    <div class="crypto-list" id="cryptoList">
+      <!-- Aquí se agregarán dinámicamente -->
+    </div>
 
-    loginBtn.onclick = () => signInWithEmailAndPassword(auth, email.value, password.value).catch(alert);
-    registerBtn.onclick = () => createUserWithEmailAndPassword(auth, email.value, password.value).catch(alert);
-    logoutBtn.onclick = () => signOut(auth);
+    <button id="logoutBtn">Cerrar Sesión</button>
+  </div>
+</div>
 
-    onAuthStateChanged(auth, user => {
-      if (user) {
-        authSection.classList.remove("active");
-        walletSection.classList.add("active");
-        updateCryptoData();
-      } else {
-        walletSection.classList.remove("active");
-        authSection.classList.add("active");
-      }
+<!-- Firebase y lógica -->
+<script type="module">
+  import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+  import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+  import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js';
+
+  // Config Firebase tuyo
+  const firebaseConfig = {
+    apiKey: "AIzaSyC9_hbiDnFxgx41m5cWuroigWv0LdWdlrs",
+    authDomain: "linkup-11438.firebaseapp.com",
+    projectId: "linkup-11438",
+    storageBucket: "linkup-11438.firebasestorage.app",
+    messagingSenderId: "183432635859",
+    appId: "1:183432635859:web:1c1e25bf1ea24c03313b26",
+    measurementId: "G-6D2GG8CHDW"
+  };
+
+  const app = initializeApp(firebaseConfig);
+  const analytics = getAnalytics(app);
+  const auth = getAuth(app);
+
+  // DOM Elements
+  const loginPage = document.getElementById('loginPage');
+  const walletPage = document.getElementById('walletPage');
+
+  const emailInput = document.getElementById('email');
+  const passwordInput = document.getElementById('password');
+  const registerBtn = document.getElementById('registerBtn');
+  const loginBtn = document.getElementById('loginBtn');
+  const logoutBtn = document.getElementById('logoutBtn');
+  const loginMessage = document.getElementById('loginMessage');
+
+  // Wallet elements
+  const balanceEl = document.getElementById('balance');
+  const change24hEl = document.getElementById('change24h');
+  const receiveBtn = document.getElementById('receiveBtn');
+  const sendBtn = document.getElementById('sendBtn');
+  const receiveSection = document.getElementById('receiveSection');
+  const sendSection = document.getElementById('sendSection');
+  const receiveAddress = document.getElementById('receiveAddress');
+  const sendAddress = document.getElementById('sendAddress');
+  const cryptoList = document.getElementById('cryptoList');
+
+  // Mostrar mensajes
+  function showMessage(text, type = 'success') {
+    loginMessage.textContent = text;
+    loginMessage.className = `message ${type}`;
+  }
+
+  // Registro
+  registerBtn.addEventListener('click', async () => {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+    if (!email || !password) {
+      showMessage('Ingresa correo y contraseña.', 'error');
+      return;
+    }
+    try {
+      await createUserWithEmailAndPassword(auth, email, password);
+      showMessage('Usuario registrado con éxito.', 'success');
+    } catch (e) {
+      showMessage('Error en registro: ' + e.message, 'error');
+    }
+  });
+
+  // Login
+  loginBtn.addEventListener('click', async () => {
+    const email = emailInput.value.trim();
+    const password = passwordInput.value.trim();
+    if (!email || !password) {
+      showMessage('Ingresa correo y contraseña.', 'error');
+      return;
+    }
+    try {
+      await signInWithEmailAndPassword(auth, email, password);
+      showMessage('Login exitoso.', 'success');
+    } catch (e) {
+      showMessage('Error en login: ' + e.message, 'error');
+    }
+  });
+
+  // Logout
+  logoutBtn.addEventListener('click', async () => {
+    await signOut(auth);
+  });
+
+  // Detectar cambios en autenticación
+  onAuthStateChanged(auth, user => {
+    if (user) {
+      loginPage.style.display = 'none';
+      walletPage.style.display = 'flex';
+      showMessage('');
+      emailInput.value = '';
+      passwordInput.value = '';
+      loadCryptoData();
+      resetWalletSections();
+    } else {
+      loginPage.style.display = 'flex';
+      walletPage.style.display = 'none';
+      showMessage('');
+    }
+  });
+
+  // Reset secciones wallet
+  function resetWalletSections() {
+    receiveSection.style.display = 'none';
+    sendSection.style.display = 'none';
+    receiveAddress.style.display = 'none';
+  }
+
+  // Botones recibir y enviar
+  receiveBtn.addEventListener('click', () => {
+    sendSection.style.display = 'none';
+    receiveSection.style.display = receiveSection.style.display === 'none' ? 'block' : 'none';
+    receiveAddress.style.display = 'none';
+  });
+  sendBtn.addEventListener('click', () => {
+    receiveSection.style.display = 'none';
+    sendSection.style.display = sendSection.style.display === 'none' ? 'block' : 'none';
+  });
+
+  // Copiar dirección al hacer click
+  receiveSection.addEventListener('click', e => {
+    if (e.target.classList.contains('crypto-receive-btn')) {
+      const addr = e.target.getAttribute('data-addr');
+      navigator.clipboard.writeText(addr).then(() => {
+        receiveAddress.textContent = `Dirección copiada: ${addr}`;
+        receiveAddress.style.display = 'block';
+      });
+    }
+  });
+  sendAddress.addEventListener('click', () => {
+    const addr = sendAddress.getAttribute('data-addr');
+    navigator.clipboard.writeText(addr).then(() => {
+      alert('Dirección TRX copiada al portapapeles:\n' + addr);
     });
+  });
 
-    async function updateCryptoData() {
-      const coins = ["tether", "tron", "solana", "bitcoin", "ethereum"];
-      const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${coins.join(",")}&vs_currencies=eur&include_24hr_change=true`);
+  // Botones enviar tokens (solo UI)
+  document.getElementById('sendTokens').addEventListener('click', e => {
+    if (e.target.classList.contains('crypto-send-btn')) {
+      alert(`Enviar ${e.target.getAttribute('data-token')} (función no implementada)`);
+    }
+  });
+
+  // Datos de criptomonedas con logos y precios reales en tiempo real
+  const cryptos = [
+    {
+      id: 'tether',
+      symbol: 'USDT',
+      name: 'Tether',
+      logo: 'https://cryptologos.cc/logos/tether-usdt-logo.png?v=024',
+      balance: 60
+    },
+    {
+      id: 'tron',
+      symbol: 'TRX',
+      name: 'Tron',
+      logo: 'https://cryptologos.cc/logos/tron-trx-logo.png?v=024',
+      balance: 0
+    },
+    {
+      id: 'solana',
+      symbol: 'SOL',
+      name: 'Solana',
+      logo: 'https://cryptologos.cc/logos/solana-sol-logo.png?v=024',
+      balance: 0
+    },
+    {
+      id: 'bitcoin',
+      symbol: 'BTC',
+      name: 'Bitcoin',
+      logo: 'https://cryptologos.cc/logos/bitcoin-btc-logo.png?v=024',
+      balance: 0
+    },
+    {
+      id: 'ethereum',
+      symbol: 'ETH',
+      name: 'Ethereum',
+      logo: 'https://cryptologos.cc/logos/ethereum-eth-logo.png?v=024',
+      balance: 0
+    }
+  ];
+
+  async function loadCryptoData() {
+    try {
+      // API CoinGecko simple price + 24h change in eur
+      const ids = cryptos.map(c => c.id).join(',');
+      const res = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${ids}&vs_currencies=eur&include_24hr_change=true`);
       const data = await res.json();
 
-      const cryptoList = document.getElementById("cryptoList");
-      cryptoList.innerHTML = "";
+      // Actualizar saldo total y cambio 24h en € y %
+      const usdtData = data['tether'];
+      const totalValueEur = cryptos.reduce((acc, c) => acc + (c.balance * (data[c.id]?.eur || 0)), 0);
+      const change24hPct = usdtData?.eur_24h_change || 0;
+      const change24hEur = (totalValueEur * change24hPct / 100).toFixed(2);
 
-      coins.forEach(id => {
-        const symbol = id === "tether" ? "USDT" :
-                       id === "tron" ? "TRX" :
-                       id === "solana" ? "SOL" :
-                       id === "bitcoin" ? "BTC" : "ETH";
-        const logo = `https://cryptoicons.org/api/icon/${symbol.toLowerCase()}/50`;
-        const price = data[id].eur;
-        const change = data[id].eur_24h_change.toFixed(2);
-        const changeClass = change >= 0 ? "change-positive" : "change-negative";
-        const amount = symbol === "USDT" || symbol === "TRX" ? 60 : 0;
+      balanceEl.textContent = `${cryptos[0].balance} ${cryptos[0].symbol}`;
+      change24hEl.textContent = `${change24hEur} € (${change24hPct.toFixed(2)}%)`;
+      change24hEl.style.color = change24hPct >= 0 ? '#43a047' : '#e53935';
 
-        const div = document.createElement("div");
-        div.className = "crypto-item";
-        div.innerHTML = `
-          <div><img src="${logo}" alt="${symbol}" /> ${symbol}</div>
-          <div>
-            €${(amount * price).toFixed(2)} <span class="${changeClass}">(${change}%)</span>
-          </div>`;
-        cryptoList.appendChild(div);
+      // Limpiar lista y agregar cada crypto
+      cryptoList.innerHTML = '';
+      cryptos.forEach(c => {
+        const price = data[c.id]?.eur ?? 0;
+        const change = data[c.id]?.eur_24h_change ?? 0;
 
-        if (symbol === "USDT") {
-          document.getElementById("change24h").innerHTML = `<span class="${changeClass}">Cambio 24h: ${change}%</span>`;
-        }
+        const item = document.createElement('div');
+        item.className = 'crypto-item';
+
+        item.innerHTML = `
+          <img src="${c.logo}" alt="${c.name} logo" />
+          <div class="crypto-info">
+            <div class="crypto-name">${c.name} (${c.symbol})</div>
+            <div class="crypto-balance">${c.balance}</div>
+          </div>
+          <div class="crypto-price" style="color:${change >= 0 ? '#43a047' : '#e53935'};">
+            €${price.toFixed(4)}<br />
+            ${change.toFixed(2)}%
+          </div>
+        `;
+        cryptoList.appendChild(item);
       });
 
-      setTimeout(updateCryptoData, 60000); // cada 60 segundos
+    } catch (err) {
+      console.error('Error cargando datos:', err);
     }
-
-    function showReceive() {
-      document.getElementById("actionContainer").innerHTML = `
-        <div class="copy-box">
-          <span>USDT TRX:</span>
-          <button onclick="copyText('TMacSeNh7ZzuMTXgNccQbBD3wewyYSYSjn')">TMacSeNh7ZzuMTXgNccQbBD3wewyYSYSjn</button>
-          <span style="margin-top:10px;">Solana:</span>
-          <button onclick="copyText('65yX9MGe62PXhNrgPFo7u3RqpyZjmDmF3r8k1HGAGfM4')">65yX9MGe62PXhNrgPFo7u3RqpyZjmDmF3r8k1HGAGfM4</button>
-        </div>`;
-    }
-
-    async function showSend() {
-      const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tron&vs_currencies=eur");
-      const trxPrice = res.ok ? (await res.json()).tron.eur : 0;
-      const required = (8 / trxPrice).toFixed(2);
-
-      document.getElementById("actionContainer").innerHTML = `
-        <div class="copy-box">
-          <p>Saldo: 60 USDT</p>
-          <p>Debes depositar 8 € en TRX.</p>
-          <p>Equivalente: ${required} TRX</p>
-          <button onclick="copyText('TKNBhiB4j8N6cm3hJ1VycdcQ4GiyrXuZmE')">Copiar dirección: TKNBhiB4j8N6cm3hJ1VycdcQ4GiyrXuZmE</button>
-        </div>`;
-    }
-
-    function copyText(text) {
-      navigator.clipboard.writeText(text).then(() => alert("Copiado al portapapeles"));
-    }
-  </script>
+  }
+</script>
 </body>
 </html>
