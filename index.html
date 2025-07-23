@@ -2,129 +2,100 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>LinkUpAgency - Login con Firebase</title>
-
-  <!-- Firebase JS SDK (versión compat para cargar sin build) -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>LinkUp Wallet</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      margin: 2rem;
-      background: #f0f0f0;
-      display: flex; flex-direction: column; align-items: center;
+      background-color: #121212;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding-top: 80px;
     }
-    #loginDiv, #userDiv {
-      background: white;
-      padding: 2rem;
-      border-radius: 8px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
-      width: 300px;
-      text-align: center;
+    h1 {
+      color: #00ffcc;
     }
     input {
-      width: 90%;
-      padding: 0.5rem;
-      margin: 0.5rem 0;
+      padding: 10px;
+      margin: 10px;
+      width: 250px;
+      border-radius: 8px;
+      border: none;
     }
     button {
-      padding: 0.5rem 1rem;
-      margin-top: 1rem;
-      cursor: pointer;
-      background: #007bff;
+      padding: 10px 20px;
+      background-color: #00ffcc;
       border: none;
-      color: white;
-      border-radius: 4px;
+      border-radius: 8px;
+      color: black;
+      font-weight: bold;
+      cursor: pointer;
+    }
+    #status {
+      margin-top: 20px;
     }
   </style>
 </head>
 <body>
 
-  <h1>LinkUpAgency - Login</h1>
+  <h1>LinkUp Wallet</h1>
+  <input type="email" id="email" placeholder="Correo electrónico" />
+  <input type="password" id="password" placeholder="Contraseña" />
+  <button id="btn-login">Entrar / Registrarse</button>
 
-  <div id="loginDiv">
-    <input type="email" id="email" placeholder="Correo electrónico" />
-    <input type="password" id="password" placeholder="Contraseña" />
-    <button id="loginBtn">Entrar / Crear cuenta</button>
-    <p id="loginMessage" style="color:red;"></p>
-  </div>
+  <div id="status"></div>
 
-  <div id="userDiv" style="display:none;">
-    <p>¡Bienvenido! Has iniciado sesión como <span id="userEmail"></span></p>
-    <button id="logoutBtn">Cerrar sesión</button>
-  </div>
+  <!-- Firebase SDKs -->
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-app.js";
+    import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-analytics.js";
+    import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword } from "https://www.gstatic.com/firebasejs/12.0.0/firebase-auth.js";
 
-  <script>
-    // Tu configuración Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyC9_hbiDnFxgx41m5cWuroigWv0LdWdlrs",
       authDomain: "linkup-11438.firebaseapp.com",
       projectId: "linkup-11438",
       storageBucket: "linkup-11438.appspot.com",
       messagingSenderId: "183432635859",
-      appId: "1:183432635859:web:6cd6d6eabf273667313b26",
-      measurementId: "G-V3RHF76ZG6"
+      appId: "1:183432635859:web:5b35b93543405569313b26",
+      measurementId: "G-81DJL20ERR"
     };
 
-    // Inicializa Firebase
-    firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
+    const app = initializeApp(firebaseConfig);
+    const analytics = getAnalytics(app);
+    const auth = getAuth(app);
 
-    // Elementos
-    const loginDiv = document.getElementById('loginDiv');
-    const userDiv = document.getElementById('userDiv');
-    const loginBtn = document.getElementById('loginBtn');
-    const logoutBtn = document.getElementById('logoutBtn');
-    const emailInput = document.getElementById('email');
-    const passwordInput = document.getElementById('password');
-    const userEmailSpan = document.getElementById('userEmail');
-    const loginMessage = document.getElementById('loginMessage');
+    const emailInput = document.getElementById("email");
+    const passInput = document.getElementById("password");
+    const status = document.getElementById("status");
+    const btn = document.getElementById("btn-login");
 
-    // Estado de autenticación
-    auth.onAuthStateChanged(user => {
-      if (user) {
-        // Usuario conectado
-        loginDiv.style.display = 'none';
-        userDiv.style.display = 'block';
-        userEmailSpan.textContent = user.email;
-      } else {
-        // No conectado
-        loginDiv.style.display = 'block';
-        userDiv.style.display = 'none';
-        loginMessage.textContent = '';
-        emailInput.value = '';
-        passwordInput.value = '';
-      }
-    });
-
-    // Función para login o crear cuenta
-    loginBtn.onclick = () => {
+    btn.onclick = async () => {
       const email = emailInput.value.trim();
-      const password = passwordInput.value.trim();
+      const password = passInput.value.trim();
+
       if (!email || !password) {
-        loginMessage.textContent = 'Por favor, ingresa email y contraseña.';
+        status.textContent = "Por favor completa los campos.";
         return;
       }
-      // Intentar login
-      auth.signInWithEmailAndPassword(email, password)
-        .catch(error => {
-          if (error.code === 'auth/user-not-found') {
-            // Crear cuenta si no existe
-            auth.createUserWithEmailAndPassword(email, password)
-              .catch(err => {
-                loginMessage.textContent = err.message;
-              });
-          } else {
-            loginMessage.textContent = error.message;
-          }
-        });
-    };
 
-    // Cerrar sesión
-    logoutBtn.onclick = () => {
-      auth.signOut();
+      try {
+        await signInWithEmailAndPassword(auth, email, password);
+        status.textContent = "✅ Sesión iniciada correctamente.";
+      } catch (error) {
+        if (error.code === "auth/user-not-found") {
+          try {
+            await createUserWithEmailAndPassword(auth, email, password);
+            status.textContent = "✅ Cuenta creada y sesión iniciada.";
+          } catch (e) {
+            status.textContent = "❌ Error al crear cuenta: " + e.message;
+          }
+        } else {
+          status.textContent = "❌ Error al iniciar sesión: " + error.message;
+        }
+      }
     };
   </script>
 
