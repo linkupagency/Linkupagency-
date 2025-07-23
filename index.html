@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>USDT 💸 con LinkUpAgency - Debug</title>
+<title>USDT 💸 con LinkUpAgency - Demo Catflash</title>
 <style>
   body {
     background: #0f172a;
@@ -13,7 +13,7 @@
     padding: 50px 20px;
   }
   h1 {
-    margin-bottom: 30px;
+    margin-bottom: 40px;
   }
   button {
     background-color: #22c55e;
@@ -29,37 +29,16 @@
   button:hover {
     background-color: #16a34a;
   }
-  #log {
-    margin-top: 30px;
-    font-family: monospace;
-    text-align: left;
-    max-width: 600px;
-    margin-left: auto;
-    margin-right: auto;
-    background: #1e293b;
-    padding: 15px;
-    border-radius: 8px;
-    min-height: 120px;
-    overflow-y: auto;
-  }
 </style>
 </head>
 <body>
 
-<h1>USDT 💸 con LinkUpAgency - Debug</h1>
+<h1>USDT 💸 con LinkUpAgency</h1>
 
 <button id="connectBtn">Connect MetaMask</button><br/>
 <button id="instagramBtn">Contactar o Comprar con LinkUp 🔗</button>
 
-<div id="log"></div>
-
 <script>
-  const logEl = document.getElementById('log');
-  function log(msg) {
-    logEl.innerHTML += msg + '<br>';
-    logEl.scrollTop = logEl.scrollHeight;
-  }
-
   document.getElementById('instagramBtn').onclick = function() {
     window.open('https://www.instagram.com/linkup_es?igsh=YWFmMDUxeWU1OGo1', '_blank');
   };
@@ -70,11 +49,10 @@
       return;
     }
     try {
-      log('Solicitando conexión a MetaMask...');
-      const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-      log('Conectado con la cuenta: ' + accounts[0]);
+      // Pedir permiso para conectar
+      await ethereum.request({ method: 'eth_requestAccounts' });
 
-      log('Añadiendo red BNB Smart Chain...');
+      // Añadir red BSC custom (la de catflash)
       await ethereum.request({
         method: 'wallet_addEthereumChain',
         params: [{
@@ -89,32 +67,30 @@
           blockExplorerUrls: ['https://bscscan.com']
         }]
       });
-      log('Red añadida correctamente.');
 
-      log('Añadiendo token USDT falso...');
+      // Añadir token USDT falso Catflash
       const added = await ethereum.request({
         method: 'wallet_watchAsset',
         params: {
           type: 'ERC20',
           options: {
-            address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+            address: '0x3c8B650257cFb3f120dBfa2e2AaFdA3c0A5D7B6E',
             symbol: 'USDT',
-            decimals: 6,
+            decimals: 18,
             image: 'https://cryptologos.cc/logos/tether-usdt-logo.png?v=032'
           }
         }
       });
+
       if (added) {
-        log('Token USDT añadido a MetaMask.');
+        alert("✅ Token USDT falso añadido a MetaMask. Abre MetaMask para ver los 1000 tokens.");
       } else {
-        log('El token USDT no fue añadido (probablemente cancelado).');
+        alert("⚠️ No se añadió el token (probablemente cancelaste).");
       }
 
-      alert("✅ ¡Conectado y configurado! Abre MetaMask para ver los 1000 USDT falsos.");
     } catch (error) {
       console.error(error);
-      log('ERROR: ' + (error.message || error));
-      alert("❌ Error detectado. Mira la consola y los mensajes en pantalla.");
+      alert("❌ Error al conectar o añadir red/token.");
     }
   }
 
