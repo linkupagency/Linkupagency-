@@ -2,40 +2,75 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Mi página Catflash - Linkupagency</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Demo USDT con Linkupagency</title>
   <style>
-    body { font-family: Arial, sans-serif; text-align: center; margin-top: 50px; }
-    button { padding: 15px 30px; font-size: 18px; cursor: pointer; }
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #121212;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    button {
+      padding: 15px 30px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background-color: #3b82f6;
+      color: white;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    button:hover {
+      background-color: #2563eb;
+    }
   </style>
 </head>
 <body>
-  <h1>Demo USDT con LinkUP</h1>
-  <button id="connectButton">Conectar MetaMask y recibir tokens</button>
 
-  <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.min.js"></script>
+  <h1>Demo USDT Falso</h1>
+  <button id="connectButton">Connect MetaMask</button>
+
   <script>
     const connectButton = document.getElementById('connectButton');
 
-    // Datos reales de Catflash
-    const rpcUrl = 'https://dataseed-binance.catflash.cat/';
-    const chainId = '0x61';
-    const tokenContractAddress = '0x560F5d6e08C81e3A0c71F4128B4B3f4A91593309';
-    const tokenAbi = [
-      "function faucet() public"
-    ];
+    connectButton.addEventListener('click', async () => {
+      if (typeof window.ethereum !== 'undefined') {
+        try {
+          // Solicitar acceso a la wallet
+          await ethereum.request({ method: 'eth_requestAccounts' });
 
-    connectButton.onclick = async () => {
-      if (!window.ethereum) {
-        alert('Por favor instala MetaMask para continuar.');
-        return;
+          // Añadir Binance Smart Chain a MetaMask
+          await ethereum.request({
+            method: 'wallet_addEthereumChain',
+            params: [{
+              chainId: '0x38', // 56 en hexadecimal
+              chainName: 'Binance Smart Chain',
+              nativeCurrency: {
+                name: 'BNB',
+                symbol: 'BNB',
+                decimals: 18
+              },
+              rpcUrls: ['https://bsc-dataseed.binance.org/'],
+              blockExplorerUrls: ['https://bscscan.com/']
+            }]
+          });
+
+          alert('MetaMask conectada y red BSC configurada!');
+        } catch (error) {
+          console.error(error);
+          alert('Error al conectar MetaMask');
+        }
+      } else {
+        alert('Por favor instala MetaMask');
       }
+    });
+  </script>
 
-      try {
-        await window.ethereum.request({
-          method: 'wallet_addEthereumChain',
-          params: [{
-            chainId: chainId,
-            rpcUrls: [rpcUrl],
-            chainName: 'Catflash BSC',
-            nativeCurrency: { nam
-    
+</body>
+</html>
