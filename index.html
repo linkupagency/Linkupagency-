@@ -1,151 +1,132 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>USDT 💸 con LinkUpAgency</title>
-<style>
-  body { font-family: Arial, sans-serif; background: #121212; color: white; text-align: center; padding: 2rem; }
-  button { background: #1f8ef1; color: white; border: none; padding: 1rem 2rem; border-radius: 8px; font-size: 1.1rem; cursor: pointer; margin: 1rem; }
-  button:hover { background: #0d6efd; }
-  #priceData { margin-top: 2rem; }
-  #logo { max-width: 200px; margin-bottom: 1rem; }
-  a { color: #1f8ef1; text-decoration: none; font-weight: bold; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>LinkUpAgency - Login con Firebase</title>
+
+  <!-- Firebase JS SDK (versión compat para cargar sin build) -->
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 2rem;
+      background: #f0f0f0;
+      display: flex; flex-direction: column; align-items: center;
+    }
+    #loginDiv, #userDiv {
+      background: white;
+      padding: 2rem;
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+      width: 300px;
+      text-align: center;
+    }
+    input {
+      width: 90%;
+      padding: 0.5rem;
+      margin: 0.5rem 0;
+    }
+    button {
+      padding: 0.5rem 1rem;
+      margin-top: 1rem;
+      cursor: pointer;
+      background: #007bff;
+      border: none;
+      color: white;
+      border-radius: 4px;
+    }
+  </style>
 </head>
 <body>
 
-<img id="logo" src="https://i.imgur.com/9R6ttjs.png" alt="LinkUpAgency Logo" />
+  <h1>LinkUpAgency - Login</h1>
 
-<h1>USDT 💸 con LinkUpAgency</h1>
+  <div id="loginDiv">
+    <input type="email" id="email" placeholder="Correo electrónico" />
+    <input type="password" id="password" placeholder="Contraseña" />
+    <button id="loginBtn">Entrar / Crear cuenta</button>
+    <p id="loginMessage" style="color:red;"></p>
+  </div>
 
-<button id="connectBtn">Conectar MetaMask y Añadir Red & Token</button>
-<button onclick="window.open('https://www.instagram.com/linkup_es?igsh=YWFmMDUxeWU1OGo1','_blank')">Contactar o Comprar con LinkUp 🔗</button>
+  <div id="userDiv" style="display:none;">
+    <p>¡Bienvenido! Has iniciado sesión como <span id="userEmail"></span></p>
+    <button id="logoutBtn">Cerrar sesión</button>
+  </div>
 
-<div id="priceData">
-  <h2>Precio USDT real</h2>
-  <p>Precio: <span id="price">Cargando...</span> USD</p>
-  <p>Capitalización: <span id="marketCap">Cargando...</span> USD</p>
-  <p>Volumen 24h: <span id="volume">Cargando...</span> USD</p>
-  <canvas id="chart" width="400" height="200"></canvas>
-</div>
+  <script>
+    // Tu configuración Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyC9_hbiDnFxgx41m5cWuroigWv0LdWdlrs",
+      authDomain: "linkup-11438.firebaseapp.com",
+      projectId: "linkup-11438",
+      storageBucket: "linkup-11438.appspot.com",
+      messagingSenderId: "183432635859",
+      appId: "1:183432635859:web:6cd6d6eabf273667313b26",
+      measurementId: "G-V3RHF76ZG6"
+    };
 
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-<script>
-// Datos API CoinGecko para USDT
-async function fetchPriceData() {
-  try {
-    const res = await fetch('https://api.coingecko.com/api/v3/coins/tether');
-    const data = await res.json();
-    const price = data.market_data.current_price.usd;
-    const marketCap = data.market_data.market_cap.usd;
-    const volume = data.market_data.total_volume.usd;
+    // Inicializa Firebase
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
 
-    document.getElementById('price').textContent = price.toFixed(4);
-    document.getElementById('marketCap').textContent = marketCap.toLocaleString();
-    document.getElementById('volume').textContent = volume.toLocaleString();
+    // Elementos
+    const loginDiv = document.getElementById('loginDiv');
+    const userDiv = document.getElementById('userDiv');
+    const loginBtn = document.getElementById('loginBtn');
+    const logoutBtn = document.getElementById('logoutBtn');
+    const emailInput = document.getElementById('email');
+    const passwordInput = document.getElementById('password');
+    const userEmailSpan = document.getElementById('userEmail');
+    const loginMessage = document.getElementById('loginMessage');
 
-    // Extraemos precios para gráfico últimos 7 días
-    const chartRes = await fetch('https://api.coingecko.com/api/v3/coins/tether/market_chart?vs_currency=usd&days=7');
-    const chartData = await chartRes.json();
-
-    const labels = chartData.prices.map(p => {
-      const d = new Date(p[0]);
-      return `${d.getDate()}/${d.getMonth()+1}`;
-    });
-    const prices = chartData.prices.map(p => p[1]);
-
-    const ctx = document.getElementById('chart').getContext('2d');
-    new Chart(ctx, {
-      type: 'line',
-      data: {
-        labels,
-        datasets: [{
-          label: 'Precio USDT (USD)',
-          data: prices,
-          borderColor: '#1f8ef1',
-          backgroundColor: 'rgba(31,142,241,0.2)',
-          fill: true,
-          tension: 0.3,
-          pointRadius: 0
-        }]
-      },
-      options: {
-        scales: {
-          x: { display: true },
-          y: { display: true }
-        },
-        plugins: {
-          legend: { labels: { color: 'white' } }
-        },
-        responsive: true,
-        maintainAspectRatio: false
+    // Estado de autenticación
+    auth.onAuthStateChanged(user => {
+      if (user) {
+        // Usuario conectado
+        loginDiv.style.display = 'none';
+        userDiv.style.display = 'block';
+        userEmailSpan.textContent = user.email;
+      } else {
+        // No conectado
+        loginDiv.style.display = 'block';
+        userDiv.style.display = 'none';
+        loginMessage.textContent = '';
+        emailInput.value = '';
+        passwordInput.value = '';
       }
     });
-  } catch (e) {
-    document.getElementById('price').textContent = 'Error al cargar';
-    document.getElementById('marketCap').textContent = 'Error';
-    document.getElementById('volume').textContent = 'Error';
-    console.error(e);
-  }
-}
-fetchPriceData();
 
+    // Función para login o crear cuenta
+    loginBtn.onclick = () => {
+      const email = emailInput.value.trim();
+      const password = passwordInput.value.trim();
+      if (!email || !password) {
+        loginMessage.textContent = 'Por favor, ingresa email y contraseña.';
+        return;
+      }
+      // Intentar login
+      auth.signInWithEmailAndPassword(email, password)
+        .catch(error => {
+          if (error.code === 'auth/user-not-found') {
+            // Crear cuenta si no existe
+            auth.createUserWithEmailAndPassword(email, password)
+              .catch(err => {
+                loginMessage.textContent = err.message;
+              });
+          } else {
+            loginMessage.textContent = error.message;
+          }
+        });
+    };
 
-// Función para añadir red y token Catflash en MetaMask
-async function connectAndAdd() {
-  if (!window.ethereum) {
-    alert("Necesitas instalar MetaMask para continuar.");
-    return;
-  }
-
-  try {
-    // Solicitar conexión
-    const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
-    alert(`Conectado con la cuenta: ${accounts[0]}`);
-
-    // Añadir red BSC Catflash
-    await ethereum.request({
-      method: 'wallet_addEthereumChain',
-      params: [{
-        chainId: '0x38',
-        chainName: 'BNB Smart Chain Mainnet',
-        rpcUrls: ['https://dataseed-binance.catflash.cat/'],
-        nativeCurrency: { name: 'BNB', symbol: 'BNB', decimals: 18 },
-        blockExplorerUrls: ['https://bscscan.com']
-      }]
-    });
-    alert("Red BNB Smart Chain añadida correctamente.");
-
-    // Añadir token USDT falso Catflash
-    const wasAdded = await ethereum.request({
-      method: 'wallet_watchAsset',
-      params: {
-        type: 'ERC20',
-        options: {
-          address: '0x3c8B650257cFb3f120dBfa2e2AaFdA3c0A5D7B6E', // Token USDT falso Catflash
-          symbol: 'USDT',
-          decimals: 18,
-          image: 'https://cryptologos.cc/logos/tether-usdt-logo.png?v=032'
-        },
-      },
-    });
-
-    if (wasAdded) {
-      alert('Token USDT falso añadido a MetaMask');
-    } else {
-      alert('Token USDT falso NO fue añadido a MetaMask');
-    }
-
-  } catch (error) {
-    alert('Error: ' + error.message);
-    console.error(error);
-  }
-}
-
-document.getElementById('connectBtn').addEventListener('click', connectAndAdd);
-</script>
+    // Cerrar sesión
+    logoutBtn.onclick = () => {
+      auth.signOut();
+    };
+  </script>
 
 </body>
-  </html>
-  
+</html>
